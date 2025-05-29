@@ -15,10 +15,11 @@ GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     st.error("GEMINI_API_KEY not found in Streamlit Secrets. Add it under Settings → Secrets.")
     st.stop()
+# Configure Google Generative AI client
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-pro")
 
-# --- Sidebar: Upload Policies ---
+# --- Sidebar: Upload & Ingest Policies ---
 with st.sidebar:
     st.header("Load HR Policies")
     uploaded_files = st.file_uploader(
@@ -50,8 +51,8 @@ with st.sidebar:
         # Split into chunks
         splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         chunks = splitter.split_documents(docs)
-        # Build vector store
-        embeddings = GooglePalmEmbeddings(api_key=GEMINI_API_KEY)
+        # Build vector store (pass google_api_key explicitly)
+        embeddings = GooglePalmEmbeddings(google_api_key=GEMINI_API_KEY)
         vectorstore = Chroma.from_documents(
             chunks, embeddings, persist_directory="hr_policy_db"
         )
@@ -79,8 +80,8 @@ else:
         docs = st.session_state.vectorstore.similarity_search(user_input, k=4)
         context = "\n\n".join([d.page_content for d in docs])
         prompt = (
-            "You are an HR policy assistant. Use the following excerpts to answer the question.\n\n"
-            f"{context}\n\nQuestion: {user_input}"
+            "You are an HR policy assistant. Use the following excerpts to answer the question." +
+            f"\n\n{context}\n\nQuestion: {user_input}"
         )
         # Stream assistant response
         full_response = ""
@@ -94,3 +95,7 @@ else:
             placeholder.write(full_response)
         # Save assistant message
         st.session_state.history.append({"role": "assistant", "content": full_response})
+
+# Footer
+st.markdown("---")
+st.caption("Built with Streamlit 💖 and Google Gemini")

@@ -71,10 +71,11 @@ You are an HR policy assistant. Read the policy below and answer concisely.
 Question: {user_question}
 Answer:"""
         # Generate answer
-        response = genai.generate_text(
-            model="text-bison-001",
-            prompt=prompt,
-        )
+        response = genai.text.generate(
+    model="text-bison-001",
+    prompt=prompt,
+)
+
         # Extract response text
         answer = getattr(response, 'text', None) or response
         st.markdown(f"**Answer:** {answer}")

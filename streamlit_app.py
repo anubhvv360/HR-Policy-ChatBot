@@ -49,8 +49,8 @@ if st.sidebar.button("Load Policies"):
     for pdf_file in uploaded_files:
         reader = pypdf.PdfReader(pdf_file)
         for page in reader.pages:
-            combined_text += (page.extract_text() or "") + "
-"
+            combined_text += (page.extract_text() or "") + ""
+
     # Append free-text policy
     combined_text += policy_text_input
     st.session_state.policy_text = combined_text

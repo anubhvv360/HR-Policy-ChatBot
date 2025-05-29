@@ -1,6 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 import pypdf
+import requests  # for downloading sample HR manual
 
 # --- App Config ---
 st.set_page_config(page_title="HR Policy Bot", layout="wide")
@@ -15,7 +16,20 @@ genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-2.0-flash")
 
 # --- Sidebar: Load HR Policies ---
-st.sidebar.header("1. Load HR Policies")
+st.sidebar.subheader("Get a Sample HR Manual")
+# Button to download sample HR manual from GitHub
+sample_url = "https://raw.githubusercontent.com/anubhvv360/HR-Policy-ChatBot/main/Data/hr_policy_manual.pdf"
+try:
+    sample_pdf = requests.get(sample_url).content
+    st.sidebar.download_button(
+        label="Download Sample HR Manual",
+        data=sample_pdf,
+        file_name="hr_policy_manual.pdf",
+        mime="application/pdf"
+    )
+except Exception as e:
+    st.sidebar.error(f"Could not fetch sample manual: {e}")
+
 # Only PDF upload option
 uploaded_files = st.sidebar.file_uploader(
     "Upload PDF files", type=["pdf"], accept_multiple_files=True

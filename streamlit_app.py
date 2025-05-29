@@ -65,6 +65,50 @@ else:
         # Extract and display the answer
         answer = getattr(response, 'text', None) or response.parts[0].text
         st.markdown(f"**Answer:** {answer}")
-
+# --- Sidebar: About & Load HR Policies ---
+st.sidebar.title("ℹ️ About This App")
+st.sidebar.markdown("""
+HR Policy Bot lets you upload your HR policy PDFs and chat with an AI assistant to get concise answers grounded in your documents.
+""")
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 📦 Library Versions")
+st.sidebar.markdown(f"🔹 **Streamlit**: {st.__version__}")
+st.sidebar.markdown(f"🔹 **Google Generative AI**: {genai.__version__ if hasattr(genai, '__version__') else 'N/A'}")
+st.sidebar.markdown(f"🔹 **pypdf**: {pypdf.__version__}")
+st.sidebar.markdown(f"🔹 **requests**: {requests.__version__}")
+st.sidebar.title("💡 Tips for Best Results")
+st.sidebar.markdown("""
+- Upload clear, text-based PDF manuals for accurate extraction.
+- Keep individual PDF file sizes under 10MB.
+- Ask specific, concise questions for precise answers.
+- For broad policy overviews, include fewer documents at a time.
+""")
+st.sidebar.markdown("---")
+st.sidebar.markdown("Have feedback? [Reach out!](mailto:anubhav.verma360@gmail.com) 😊", unsafe_allow_html=True)
+st.sidebar.caption("Disclaimer: This tool provides assistance but may not reflect official legal advice.")
 # --- Footer ---
-st.caption("Built with Streamlit 💖 and Google Gemini")
+st.markdown("""
+    <style>
+    @keyframes gradientAnimation {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    .animated-gradient {
+        background: linear-gradient(90deg, blue, purple, blue);
+        background-size: 300% 300%;
+        animation: gradientAnimation 8s ease infinite;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+        margin-top: 20px;
+        color: white;
+        font-weight: normal;
+        font-size: 18px;
+    }
+    </style>
+
+    <div class="animated-gradient">
+        Made with ❤️ by Anubhav Verma
+    </div>
+""", unsafe_allow_html=True)

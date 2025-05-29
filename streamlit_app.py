@@ -15,7 +15,6 @@ GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     st.error("GEMINI_API_KEY not found in Streamlit Secrets. Add it under Settings → Secrets.")
     st.stop()
-# Configure Google Generative AI client
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-pro")
 
@@ -45,18 +44,15 @@ with st.sidebar:
         for pdf in uploaded_files:
             loader = PyPDFLoader(pdf)
             docs.extend(loader.load())
-        # Add free-text policy
+        # Include free-text policy
         if policy_text:
             docs.append(Document(page_content=policy_text, metadata={}))
         # Split into chunks
         splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         chunks = splitter.split_documents(docs)
-        # Build vector store (pass google_api_key explicitly)
+        # Build vector store in-memory
         embeddings = GooglePalmEmbeddings(google_api_key=GEMINI_API_KEY)
-        vectorstore = Chroma.from_documents(
-            chunks, embeddings, persist_directory="hr_policy_db"
-        )
-        vectorstore.persist()
+        vectorstore = Chroma.from_documents(chunks, embeddings)
         st.session_state.vectorstore = vectorstore
         st.success("Policies ingested successfully!")
 
@@ -80,7 +76,7 @@ else:
         docs = st.session_state.vectorstore.similarity_search(user_input, k=4)
         context = "\n\n".join([d.page_content for d in docs])
         prompt = (
-            "You are an HR policy assistant. Use the following excerpts to answer the question." +
+            "You are an HR policy assistant. Use the following excerpts to answer the question."
             f"\n\n{context}\n\nQuestion: {user_input}"
         )
         # Stream assistant response

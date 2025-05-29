@@ -3,8 +3,13 @@ import google.generativeai as genai
 import pypdf
 import requests  # for downloading sample HR manual
 
-# --- App Config ---
-st.set_page_config(page_title="HR Policy Bot", layout="wide")
+# Set page configuration
+st.set_page_config(
+    page_title="HR Policy Bot",
+    page_icon="💼",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # --- Google Gemini Setup ---
 GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
@@ -76,7 +81,7 @@ st.sidebar.markdown(f"🔹 **Streamlit**: {st.__version__}")
 st.sidebar.markdown(f"🔹 **Google Generative AI**: {genai.__version__ if hasattr(genai, '__version__') else 'N/A'}")
 st.sidebar.markdown(f"🔹 **pypdf**: {pypdf.__version__}")
 st.sidebar.markdown(f"🔹 **requests**: {requests.__version__}")
-st.sidebar.title("💡 Tips for Best Results")
+st.sidebar.markdown("### 💡 Tips for Best Results")
 st.sidebar.markdown("""
 - Upload clear, text-based PDF manuals for accurate extraction.
 - Keep individual PDF file sizes under 10MB.

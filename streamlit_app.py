@@ -18,9 +18,9 @@ st.sidebar.header("1. Load HR Policies")
 uploaded_files = st.sidebar.file_uploader(
     "Upload PDF files", type=["pdf"], accept_multiple_files=True
 )
-policy_input = st.sidebar.text_area(
-    "Or paste HR policy text here", height=200
-)
+#policy_input = st.sidebar.text_area(
+#    "Or paste HR policy text here", height=200
+#)
 
 if st.sidebar.button("Load Policies"):
     combined_text = ""

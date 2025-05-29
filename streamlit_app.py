@@ -52,9 +52,5 @@ else:
         answer = getattr(response, 'text', None) or response.parts[0].text
         st.markdown(f"**Answer:** {answer}")
 
-# Loop through files and create download buttons
-for filename, url in files.items():
-    download_file_from_github(url, filename)
-
 # --- Footer ---
 st.caption("Built with Streamlit 💖 and Google Gemini")

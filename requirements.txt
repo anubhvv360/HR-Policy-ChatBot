@@ -1,2 +1,6 @@
-streamlit
-pandas
+streamlit>=1.25.0
+langchain>=0.0.280              # for DocumentLoaders, text‐splitters, chains, etc.
+pypdf>=3.8.1                    # PDF parsing support for PyPDFLoader
+faiss-cpu>=1.7.2                # vector index backend
+google-generativeai>=0.8.5      # ChatGoogleGenerativeAI
+google-cloud-aiplatform>=1.26.0 # VertexAIEmbeddings

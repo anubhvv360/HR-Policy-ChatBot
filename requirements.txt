@@ -1,6 +1,7 @@
 streamlit>=1.25.0
-langchain>=0.0.280              # for DocumentLoaders, text‐splitters, chains, etc.
-pypdf>=3.8.1                    # PDF parsing support for PyPDFLoader
-faiss-cpu>=1.7.2                # vector index backend
-google-generativeai>=0.8.5      # ChatGoogleGenerativeAI
-google-cloud-aiplatform>=1.26.0 # VertexAIEmbeddings
+langchain>=0.0.280
+langchain-community>=0.0.24        # for PyPDFLoader and other community loaders
+pypdf>=3.8.1                      # PDF parsing backend
+faiss-cpu>=1.7.2                  # or faiss-gpu if you have CUDA
+google-generativeai>=0.8.5
+google-cloud-aiplatform>=1.26.0

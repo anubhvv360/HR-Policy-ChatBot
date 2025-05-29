@@ -46,11 +46,10 @@ policy_text_input = st.sidebar.text_area(
 if st.sidebar.button("Load Policies"):
     combined_text = ""
     # Extract text from PDFs
-    for pdf_file in uploaded_files:
+    for pdf_file in uploaded_files or []:
         reader = pypdf.PdfReader(pdf_file)
         for page in reader.pages:
-            combined_text += (page.extract_text() or "") + "
-"
+            combined_text += (page.extract_text() or "") + "\n"
     # Append free-text policy
     combined_text += policy_text_input
     st.session_state.policy_text = combined_text
@@ -58,20 +57,19 @@ if st.sidebar.button("Load Policies"):
 
 # --- Main: Chat Interface ---
 st.title("💼 HR Policy Bot")
-if 'policy_text' not in st.session_state:
+if 'policy_text' not in st.session_state or not st.session_state.policy_text:
     st.info("Please load your HR policy (PDF or text) from the sidebar to begin.")
 else:
     user_question = st.text_input("Ask a question about your HR policies...")
     if user_question:
-        # Build prompt
-        prompt = (
-            "You are an HR policy assistant. Read the policy below and answer concisely.
+        # Build prompt using triple-quoted f-string
+        prompt = f"""
+You are an HR policy assistant. Read the policy below and answer concisely.
 
-" +
-            f"{st.session_state.policy_text}
+{st.session_state.policy_text}
 
 Question: {user_question}
-Answer:")
+Answer:"""
         # Generate answer
         response = genai.generate_text(
             model="text-bison-001",

@@ -39,11 +39,16 @@ with st.sidebar:
         "Or paste HR policy text", value=default_policy, height=200
     )
     if st.button("Ingest Policies"):
+        import tempfile
         docs = []
-        # Load PDF docs
-        for pdf in uploaded_files:
-            loader = PyPDFLoader(pdf)
+        # Load PDF docs by writing each to a temp file
+        for uploaded in uploaded_files:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                tmp.write(uploaded.read())
+                tmp_path = tmp.name
+            loader = PyPDFLoader(tmp_path)
             docs.extend(loader.load())
+
         # Include free-text policy
         if policy_text:
             docs.append(Document(page_content=policy_text, metadata={}))

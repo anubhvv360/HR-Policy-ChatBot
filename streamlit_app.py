@@ -8,31 +8,32 @@ from langchain.llms import GoogleGemini
 from langchain.chains import RetrievalQA
 import os
 
-# --- Streamlit App ---
+# --- Streamlit App Configuration ---
 st.set_page_config(page_title="HR Policy Bot", layout="wide")
 
-# Retrieve Gemini API key from Streamlit Secrets
-GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", None)
+# Fetch Gemini API key from Streamlit secrets
+GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
-    st.error("GEMINI_API_KEY not found in Streamlit secrets.")
+    st.error("GEMINI_API_KEY not found in Streamlit secrets. Please add it under Settings → Secrets.")
     st.stop()
 
-# Utility: Initialize session state for vector store and chain
-if 'vectorstore' not in st.session_state:
+# Initialize session state for vector store and QA chain
+if "vectorstore" not in st.session_state:
     st.session_state.vectorstore = None
-if 'qa_chain' not in st.session_state:
+if "qa_chain" not in st.session_state:
     st.session_state.qa_chain = None
 
-# Sidebar: Instructions
+# Sidebar UI
 with st.sidebar:
-    st.header("HR Policy Bot")
-    st.write("Upload your HR policy PDFs or use the sample text to get started.")
+    st.title("HR Policy Bot")
+    st.write("Upload your HR policy PDFs or use the sample text below to get started.")
 
-# Main: File upload and text input
-st.subheader("1. Provide HR Policies")
-uploaded_files = st.file_uploader("Upload PDF files", type=['pdf'], accept_multiple_files=True)
+# Main UI: Document input
+st.header("1. Provide HR Policies")
+uploaded_files = st.file_uploader(
+    "Upload PDF files", type=["pdf"], accept_multiple_files=True
+)
 
-# Pre-filled sample HR policy text
 default_policy = '''
 Company XYZ HR Policy
 
@@ -48,54 +49,68 @@ Company XYZ HR Policy
 - Workplace Behavior: Respect, integrity, and professionalism.
 - Anti-Harassment: Zero tolerance for harassment.
 
+4. Performance Management
+- Annual reviews and goal-setting process.
+- Feedback mechanism: Quarterly check-ins.
+
+5. Compensation & Benefits
+- Salary structure, pay grades, and bonus eligibility.
+- Health insurance, retirement plans, and perks.
+
 ... (add more sections as needed)
 '''
-policy_text = st.text_area("Or paste your HR policy text here", value=default_policy, height=300)
+policy_text = st.text_area(
+    "Or paste your HR policy text here", value=default_policy, height=300
+)
 
-# Button: Load policies into vector store
+# Load policies into the vector store
 if st.button("Load Policies"):
     docs = []
-    # Load PDFs if any
-    for file in uploaded_files:
-        loader = PyPDFLoader(file)
-        loaded_docs = loader.load()
-        docs.extend(loaded_docs)
+    # Load PDF documents
+    for pdf in uploaded_files:
+        loader = PyPDFLoader(pdf)
+        docs.extend(loader.load())
 
-    # Include free-text policy as Document
+    # Include free-text policy as a Document
     if policy_text:
         docs.append(Document(page_content=policy_text, metadata={}))
 
-    # Split documents into chunks
+    # Split docs into text chunks
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    texts = splitter.split_documents(docs)
+    chunks = splitter.split_documents(docs)
 
-    # Create embeddings and vector store
+    # Generate embeddings and build Chroma vector store
     embeddings = GooglePalmEmbeddings(api_key=GEMINI_API_KEY)
-    vectorstore = Chroma.from_documents(texts, embeddings, persist_directory="hr_policy_db")
+    vectorstore = Chroma.from_documents(
+        chunks, embeddings, persist_directory="hr_policy_db"
+    )
     vectorstore.persist()
     st.session_state.vectorstore = vectorstore
 
-    # Build QA chain
-    llm = GoogleGemini(model_name="gemini-2.0-flash", temperature=0, api_key=GEMINI_API_KEY)
-    st.session_state.qa_chain = RetrievalQA.from_chain_type(
+    # Prepare the RetrievalQA chain
+    llm = GoogleGemini(
+        model_name="gemini-2.0-flash", api_key=GEMINI_API_KEY, temperature=0
+    )
+    qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
         retriever=vectorstore.as_retriever(search_kwargs={"k": 4})
     )
+    st.session_state.qa_chain = qa_chain
     st.success("HR policies loaded successfully!")
 
-# Q&A Interface
+# Q&A interface
 if st.session_state.qa_chain:
-    st.subheader("2. Ask a question about your HR policies")
+    st.header("2. Ask a question about your HR policies")
     query = st.text_input("Enter your question here")
     if query:
-        with st.spinner("Thinking..."):
+        with st.spinner("Generating answer..."):
             answer = st.session_state.qa_chain.run(query)
-        st.markdown("**Answer:**")
+        st.subheader("Answer")
         st.write(answer)
 else:
     st.info("Please load policies to enable Q&A.")
 
 # Footer
 st.markdown("---")
-st.write("Built with Streamlit 💖 and Gemini LLM")
+st.caption("Built with Streamlit 💖 and Google Gemini")

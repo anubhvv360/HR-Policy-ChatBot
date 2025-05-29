@@ -65,9 +65,3 @@ streamlit run streamlit_app.py
 
 - **Model**: Change `GenerativeModel("gemini-2.0-flash")` to another supported model if available.  
 - **Prompt**: Modify the system prompt template in `streamlit_app.py` to tune answer style (e.g., bullet points, tone).
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License. Feel free to adapt and extend!

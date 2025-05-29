@@ -11,7 +11,7 @@ if not GEMINI_API_KEY:
     st.error("GEMINI_API_KEY not found in Streamlit Secrets. Add it under Settings → Secrets.")
     st.stop()
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 # --- Load HR Policies ---
 st.sidebar.header("1. Load HR Policies")

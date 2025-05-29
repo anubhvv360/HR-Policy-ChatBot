@@ -3,7 +3,8 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import VertexAIEmbeddings
 from langchain.vectorstores import FAISS
-from langchain.chat_models import ChatGoogleGenerativeAI
+#from langchain.chat_models import ChatGoogleGenerativeAI
+from langchain.chat_models import ChatVertexAI
 from langchain.chains import RetrievalQA
 import tempfile
 
@@ -17,6 +18,7 @@ st.title("🤖 HR Policies Chatbot")
 st.write("Ask questions about your company's HR policies with ease.")
 
 # ─── DOCUMENT UPLOAD & INDEXING ───────────────────────────────────────────────────
+
 uploaded_file = st.file_uploader(
     "Upload HR Policy Document (PDF)", type=["pdf"]
 )

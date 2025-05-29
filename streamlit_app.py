@@ -52,27 +52,6 @@ else:
         answer = getattr(response, 'text', None) or response.parts[0].text
         st.markdown(f"**Answer:** {answer}")
 
-# Sidebar title
-st.sidebar.markdown("---")
-st.sidebar.title("📥 Download Sample HR Manual")
-
-# Function to download file from GitHub and serve in Streamlit
-def download_file_from_github(url, filename):
-    response = requests.get(url)
-    if response.status_code == 200:
-        st.sidebar.download_button(
-            label=f"Download {filename}",
-            data=response.content,
-            file_name=filename
-        )
-    else:
-        st.sidebar.error(f"❌ Failed to download {filename}")
-
-# GitHub raw URLs for files (Updated URLs to use 'raw.githubusercontent.com')
-files = {
-    "Sample HR Manual": "https://raw.githubusercontent.com/anubhvv360/HR-Policy-ChatBot/main/Data/hr_policy_manual.pdf"
-}
-
 # Loop through files and create download buttons
 for filename, url in files.items():
     download_file_from_github(url, filename)

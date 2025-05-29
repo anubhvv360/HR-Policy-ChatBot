@@ -3,12 +3,19 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import GooglePalmEmbeddings
 from langchain.vectorstores import Chroma
+from langchain.schema import Document
 from langchain.chat_models import ChatGoogleGenerativeAI
 from langchain.chains import RetrievalQA
 import os
 
 # --- Streamlit App ---
 st.set_page_config(page_title="HR Policy Bot", layout="wide")
+
+# Retrieve Gemini API key from Streamlit Secrets
+GEMINI_API_KEY = st.secrets.get("GEMINI_API_KEY", None)
+if not GEMINI_API_KEY:
+    st.error("GEMINI_API_KEY not found in Streamlit secrets.")
+    st.stop()
 
 # Utility: Initialize session state for vector store and chain
 if 'vectorstore' not in st.session_state:
@@ -51,23 +58,25 @@ if st.button("Load Policies"):
     # Load PDFs if any
     for file in uploaded_files:
         loader = PyPDFLoader(file)
-        loaded = loader.load()
-        docs.extend(loaded)
+        loaded_docs = loader.load()
+        docs.extend(loaded_docs)
 
-    # Include free-text policy
-    docs.append({ 'page_content': policy_text }) if policy_text else None
+    # Include free-text policy as Document
+    if policy_text:
+        docs.append(Document(page_content=policy_text, metadata={}))
 
     # Split documents into chunks
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     texts = splitter.split_documents(docs)
 
     # Create embeddings and vector store
-    embeddings = GooglePalmEmbeddings()
+    embeddings = GooglePalmEmbeddings(api_key=GEMINI_API_KEY)
     vectorstore = Chroma.from_documents(texts, embeddings, persist_directory="hr_policy_db")
+    vectorstore.persist()
     st.session_state.vectorstore = vectorstore
 
     # Build QA chain
-    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0, api_key=GEMINI_API_KEY)
     st.session_state.qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
@@ -89,4 +98,4 @@ else:
 
 # Footer
 st.markdown("---")
-st.write("Built with Streamlit ❤ and Gemini LLM")
+st.write("Built with Streamlit 💖 and Gemini LLM")

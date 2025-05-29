@@ -27,11 +27,11 @@ if st.sidebar.button("Load Policies"):
     # Read PDFs
     for pdf in uploaded_files:
         reader = pypdf.PdfReader(pdf)
-        for page in reader.pages:
-            text = page.extract_text() or ""
-            combined_text += text + "\n"
+        #for page in reader.pages:
+            #text = page.extract_text() or ""
+            #combined_text += text + "\n"
     # Append free-text policy
-    combined_text += policy_input
+    #combined_text += policy_input
     st.session_state.policy_text = combined_text
     st.sidebar.success("Policies loaded into the bot!")
 

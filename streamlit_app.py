@@ -4,7 +4,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import GooglePalmEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.schema import Document
-from langchain.chat_models import ChatGoogleAI
+from langchain.llms import GoogleGemini
 from langchain.chains import RetrievalQA
 import os
 
@@ -76,7 +76,7 @@ if st.button("Load Policies"):
     st.session_state.vectorstore = vectorstore
 
     # Build QA chain
-    llm = ChatGoogleAI(model="gemini-2.0-flash", temperature=0, api_key=GEMINI_API_KEY)
+    llm = GoogleGemini(model_name="gemini-2.0-flash", temperature=0, api_key=GEMINI_API_KEY)
     st.session_state.qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",

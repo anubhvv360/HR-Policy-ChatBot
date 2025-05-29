@@ -65,8 +65,7 @@ else:
     if user_question:
         # Build prompt
         prompt = (
-            "You are an HR policy assistant. Read the policy below and answer concisely." +
-            f"{st.session_state.policy_text}
+            "You are an HR policy assistant. Read the policy below and answer concisely." + f"{st.session_state.policy_text}
 
 Question: {user_question}
 Answer:")
